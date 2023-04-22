@@ -5,52 +5,37 @@ import { clearState, imageUpload, getAllImages } from './imageSlice';
 
 const Image = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [image, setImage] = useState([]);
-
+  const [selectedFile, setSelectedFile] = useState(null);
   function toggleDarkMode() {
     setDarkMode(!darkMode);
   }
-
   const dispatch = useDispatch();
-
-  function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        // Do something with the selected file
-        console.log(file.name);
-        setImage(file);
-        dispatch(imageUpload(file));
-      }
-
-  }
-
   const { images, isFetching, isError } = useSelector((state) => state.image);
-
-  console.log(images.data);
 
   useEffect(() => {
     dispatch(getAllImages());
   }, [dispatch]);
+  const handleFileInputChange = (event) => {
+    // handle file input change if necessary
+    setSelectedFile(event.target.files[0]);
+  };
 
   useEffect(() => {
-    if (!isFetching && !isError) {
-      setImage([]);
+    // Only attempt to upload an image if one has been selected and we are not already fetching or displaying an error
+    if (selectedFile && !isFetching && !isError) {
+      dispatch(imageUpload(selectedFile));
     }
-    return () => {
+    else {
       dispatch(clearState());
-    };
-  }, [isFetching, isError, dispatch]);
-
+    }
+  }, [selectedFile, isFetching, isError, dispatch]);
   return (
     <Fragment>
       <div className={`dark ${darkMode ? 'bg-gray-800' : 'bg-white'} text-${darkMode ? 'white' : 'black'}`}>
-        <div className="flex flex-col items-center justify-center py-2">
-          <label htmlFor="file-upload" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
-            Upload Image
-          </label>
-          <input type="file" accept="image/*" onChange={handleFileUpload} />
-          <button className="btn btn-primary" onClick={handleFileUpload}>Upload</button>
-        </div>
+        <form onSubmit={handleFileInputChange} encType="multipart/form-data" className='text-center'>
+          <input type="file" name="image" onChange={handleFileInputChange}/>
+          <button className="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer" type='submit'>Upload</button>
+        </form>
         <div className="py-2">
           <h1 className="text-3xl font-bold text-black text-center">Uploaded Images</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

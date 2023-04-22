@@ -39,8 +39,8 @@ const Dashboard = () => {
         <div className="flex flex-col items-center justify-center py-2">
           <h1 className="text-3xl font-bold text-white ">Welcome back</h1>
         </div>
-      <Image />
-      <Video />
+        <Image />
+        <Video />
         <div className="flex flex-col items-center justify-center  py-2">
           <button
             onClick={onLogOut}
